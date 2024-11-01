@@ -1,10 +1,27 @@
+'use server'
+
 import getFormattedDate from "@/lib/getFormattedDate"
 import { getPostData, getSortedPostData } from "@/lib/post"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
-export  function generateMetadata({ params}:{params : {postId:string}}){
-    const posts =   getSortedPostData()
+export async function generateStaticParams(){
+    const posts = getSortedPostData()
+
+    return posts.map((post) => ({
+        postId:post.id,
+    }))
+}
+
+interface Params {
+    params: Promise<{
+        postId:string
+    }>
+}
+
+export async function generateMetadata(props:Params) {
+    const params = await props.params;
+    const posts =   await getSortedPostData()
     const { postId } = params
 
     const post = posts.find(post => post.id === postId)
@@ -20,10 +37,10 @@ export  function generateMetadata({ params}:{params : {postId:string}}){
     }
 }
 
-export default async function Post({ params}:{params:{postId: string}}){
+export default async function Post({ params}:Params){
     
     const posts =  getSortedPostData()
-    const { postId } = params
+    const { postId } = await params
 
     const post = posts.find(post => post.id === postId)
 
@@ -39,7 +56,7 @@ export default async function Post({ params}:{params:{postId: string}}){
             <p className="mt-0">{formattedDate}</p>
             <article>
                 <section dangerouslySetInnerHTML={{ __html:contentHtml }}/>
-                    <p>
+                    <p className="mt-2 font-bold">
                         <Link href='/'>Home</Link>
                     </p>
             </article>

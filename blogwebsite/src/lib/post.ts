@@ -28,22 +28,36 @@ export function getSortedPostData():BlogPost[]{
     return allpostData.sort((a,b) => a.date < b.date ? 1 : -1)
 }
 
-export async function getPostData(id:string){
-    const fullpath = path.join(postsDirectory, `${id}.md`)
-    const fileContext = fs.readFileSync(fullpath, 'utf8')
+export async function getPostData(id: string): Promise<BlogPost & { contentHtml: string }> {
+    const fullpath = path.join(postsDirectory, `${id}.md`);
 
-    const matterResult = matter(fileContext)
-
-    const processContext = await remark().use(html).process(matterResult.content)
-
-    const contentHtml:string = processContext.toString()
-
-    const blogPostWithHtml:BlogPost & { contentHtml: string} = {
-        id,
-        title:matterResult.data.title,
-        date:matterResult.data.date,
-        contentHtml
+    // Check if the file exists before reading it
+    if (!fs.existsSync(fullpath)) {
+        throw new Error(`Post with id "${id}" not found.`);
     }
 
-    return blogPostWithHtml
+    const fileContext = fs.readFileSync(fullpath, 'utf8');
+    const matterResult = matter(fileContext);
+
+    // Ensure the content is present
+    if (!matterResult.content) {
+        throw new Error(`No content found for post "${id}".`);
+    }
+
+    const processContext = await remark().use(html).process(matterResult.content);
+    const contentHtml: string = processContext.toString();
+
+    const blogPostWithHtml: BlogPost & { contentHtml: string } = {
+        id,
+        title: matterResult.data.title,
+        date: matterResult.data.date,
+        contentHtml,
+    };
+
+    // Ensure title and date are defined
+    if (!blogPostWithHtml.title || !blogPostWithHtml.date) {
+        throw new Error(`Missing title or date for post "${id}".`);
+    }
+
+    return blogPostWithHtml;
 }
