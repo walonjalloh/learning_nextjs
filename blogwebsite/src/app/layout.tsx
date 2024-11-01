@@ -7,8 +7,8 @@ import Profile from "@/components/Profile";
 const inter = Inter({subsets:['cyrillic-ext'],weight:['400','700']})
 
 export const metadata: Metadata = {
-  title: "Blog Website",
-  description: "A blogging website about me",
+  title: "Walon's Blog Website",
+  description: "Created by Walon",
 };
 
 export default function RootLayout({
