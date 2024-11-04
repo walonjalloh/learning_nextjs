@@ -8,3 +8,8 @@
 6. learn about next.config.ts
 7. making static metadata and dynamic metadata
 8. learn about fonts, and how u can use then in next js
+9. ssg vs ssr
+10. routes handler or apis with CRUD operation.
+11. Authentication
+12. Authorization
+13. Building server in nextjs
